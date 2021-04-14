@@ -27,6 +27,7 @@ let persons = [
 ]
 
 // server endpoints
+/* GET requests */
 app.get('/', (req, resp) => {
     resp.send('<h1>Hello World!</h1>')
 })
@@ -53,7 +54,17 @@ app.get('/api/persons/:id', (req, resp) => {
     } else {
         resp.status(404).end()
     }
-    
+})
+/* POST requests */
+/* PUT requests */
+/* DELETE requests */
+app.delete('/api/persons/:id', (req, resp) => {
+    const id = Number(req.params.id)
+    // reassigns persons var to the new array created from filter function
+    persons = persons.filter(person => person.id !== id)
+
+    // returns a 'no content' status
+    resp.status(204).end()
 })
 
 // start app
