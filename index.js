@@ -1,4 +1,5 @@
 // initialize app and other needed vars
+const { response } = require('express')
 const express = require('express')
 const app = express()
 
@@ -38,8 +39,21 @@ app.get('/info', (req, resp) => {
 })
 
 app.get('/api/persons', (req, resp) => {
+    console.log('returning list of persons to client')
     resp.json(persons)
-    console.log('returned list of persons to client')
+})
+
+app.get('/api/persons/:id', (req, resp) => {
+    const id = Number(req.params.id)
+    const person = persons.find(person => person.id === id)
+    
+    if (person) {
+        console.log(`returning single item of id ${id.toString()} to client`)
+        resp.json(person)
+    } else {
+        resp.status(404).end()
+    }
+    
 })
 
 // start app
