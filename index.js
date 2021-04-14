@@ -1,9 +1,11 @@
 // initialize app and other needed vars
 const { response } = require('express')
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+app.use(morgan('tiny'))
 
 let persons = [
     {
@@ -42,7 +44,7 @@ app.get('/info', (req, resp) => {
 })
 
 app.get('/api/persons', (req, resp) => {
-    console.log('returning list of persons to client')
+    // console.log('returning list of persons to client')
     resp.json(persons)
 })
 
@@ -51,7 +53,7 @@ app.get('/api/persons/:id', (req, resp) => {
     const person = persons.find(person => person.id === id)
     
     if (person) {
-        console.log(`returning single item of id ${id.toString()} to client`)
+        // console.log(`returning single item of id ${id.toString()} to client`)
         resp.json(person)
     } else {
         resp.status(404).end()
