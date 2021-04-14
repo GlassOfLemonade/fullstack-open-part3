@@ -63,15 +63,29 @@ app.post('/api/persons', (req, resp) => {
     const newId = Math.trunc(Math.random() * 100000)
     const body = req.body
 
-    const newPerson = {
-        id: newId,
-        name: body.name,
-        number: body.number
+    if (body.name && body.number) {
+        const duplicate = persons.find(person => person.name === body.name)
+        if (duplicate) {
+            // a duplicate exists
+            console.log(duplicate)
+            const error = { error: "name must be unique!" }
+            resp.json(error)
+        } else {
+            // new entry is made
+            const newPerson = {
+                id: newId,
+                name: body.name,
+                number: body.number
+            }
+        
+            persons = persons.concat(newPerson)
+        
+            resp.json(newPerson)
+        }
+    } else {
+        const response = { error: "name or number is missing!" }
+        resp.json(response)
     }
-
-    persons = persons.concat(newPerson)
-
-    resp.json(newPerson)
 })
 /* PUT requests */
 /* DELETE requests */
