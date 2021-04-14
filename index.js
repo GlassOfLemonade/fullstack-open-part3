@@ -29,6 +29,14 @@ let persons = [
 app.get('/', (req, resp) => {
     resp.send('<h1>Hello World!</h1>')
 })
+
+app.get('/info', (req, resp) => {
+    console.log("sending info about phonebook to client")
+    const time = new Date().toString()
+    const num = persons.length
+    resp.send(`<p>Phonebook has info for ${num} people</p><p>${time}</p>`)
+})
+
 app.get('/api/persons', (req, resp) => {
     resp.json(persons)
     console.log('returned list of persons to client')
