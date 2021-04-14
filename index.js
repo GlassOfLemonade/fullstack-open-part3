@@ -2,10 +2,18 @@
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
+
+// morgan configuration
+morgan.token('body', (req) => {
+    if (req.method === 'POST') {
+        return JSON.stringify({ name: req.body.name, number: req.body.number })
+    }
+})
+
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
     {
@@ -37,7 +45,7 @@ app.get('/', (req, resp) => {
 })
 
 app.get('/info', (req, resp) => {
-    console.log("sending info about phonebook to client")
+    // console.log("sending info about phonebook to client")
     const time = new Date().toString()
     const num = persons.length
     resp.send(`<p>Phonebook has info for ${num} people</p><p>${time}</p>`)
@@ -61,7 +69,7 @@ app.get('/api/persons/:id', (req, resp) => {
 })
 /* POST requests */
 app.post('/api/persons', (req, resp) => {
-    console.log(req.headers)
+    // console.log(req.headers)
     const newId = Math.trunc(Math.random() * 100000)
     const body = req.body
 
