@@ -76,28 +76,31 @@ app.get('/api/persons/:id', (req, resp) => {
 /* POST requests */
 app.post('/api/persons', (req, resp) => {
     // console.log(req.headers)
-    const newId = Math.trunc(Math.random() * 100000)
+    // const newId = Math.trunc(Math.random() * 100000)
     const body = req.body
 
     if (body.name && body.number) {
-        const duplicate = persons.find(person => person.name === body.name)
-        if (duplicate) {
-            // a duplicate exists
-            console.log(duplicate)
-            const error = { error: "name must be unique!" }
-            resp.json(error)
-        } else {
-            // new entry is made
-            const newPerson = {
-                id: newId,
-                name: body.name,
-                number: body.number
-            }
-        
-            persons = persons.concat(newPerson)
-        
-            resp.json(newPerson)
-        }
+        // const duplicate = persons.find(person => person.name === body.name)
+        // if (duplicate) {
+        //     // a duplicate exists
+        //     console.log(duplicate)
+        //     const error = { error: "name must be unique!" }
+        //     resp.json(error)
+        // } else {
+
+        // }
+        const person = new Person({
+            name: body.name,
+            number: body.number
+        })
+
+        person.save()
+            .then(savedPerson => {
+                resp.json(savedPerson)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     } else {
         const response = { error: "name or number is missing!" }
         resp.json(response)
