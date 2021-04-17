@@ -109,12 +109,11 @@ app.post('/api/persons', (req, resp) => {
 /* PUT requests */
 /* DELETE requests */
 app.delete('/api/persons/:id', (req, resp) => {
-    const id = Number(req.params.id)
-    // reassigns persons var to the new array created from filter function
-    persons = persons.filter(person => person.id !== id)
-
-    // returns a 'no content' status
-    resp.status(204).end()
+    Person.findByIdAndRemove(req.params.id)
+        .then(result => {
+            resp.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 // start app
