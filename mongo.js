@@ -7,7 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-const url = 
+const url =
 `mongodb+srv://fullstack:${password}@cluster0.jiwuk.mongodb.net/phonebook-app?retryWrites=true&w=majority`
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
@@ -22,7 +22,7 @@ const Person = mongoose.model('Person', personSchema)
 if (process.argv.length === 3) {
     // args only contain password, return list of persons
     Person.find({}).then(result => {
-        console.log("phonebook:")
+        console.log('phonebook:')
         result.forEach(person => {
             console.log(`${person.name} ${person.number}`)
         })
@@ -34,7 +34,7 @@ if (process.argv.length === 3) {
         name: process.argv[3],
         number: process.argv[4]
     })
-    
+
     person.save().then(result => {
         console.log(`added ${result.name} number ${result.number} to phonebook`)
         mongoose.connection.close()

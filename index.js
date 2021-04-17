@@ -13,8 +13,6 @@ morgan.token('body', (req) => {
 
 const app = express()
 const Person = require('./models/person')
-const { response } = require('express')
-const person = require('./models/person')
 
 app.use(express.json())
 app.use(express.static('build'))
@@ -34,7 +32,7 @@ app.get('/info', (req, resp, next) => {
         const num = people.length
         resp.send(`<p>Phonebook has info for ${num} people</p><p>${time}</p>`)
     })
-    .catch(error => next(error))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons', (req, resp, next) => {
@@ -42,7 +40,7 @@ app.get('/api/persons', (req, resp, next) => {
     Person.find({}).then(people => {
         resp.json(people)
     })
-    .catch(error => next(error))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, resp, next) => {
@@ -72,7 +70,7 @@ app.post('/api/persons', (req, resp, next) => {
             })
             .catch(error => next(error))
     } else {
-        const response = { error: "name or number is missing!" }
+        const response = { error: 'name or number is missing!' }
         resp.status(400).json(response)
     }
 })
@@ -94,7 +92,7 @@ app.put('/api/persons/:id', (req, resp, next) => {
 app.delete('/api/persons/:id', (req, resp, next) => {
     Person.findByIdAndRemove(req.params.id)
         .then(result => {
-            resp.status(204).end()
+            resp.status(204).json(result).end()
         })
         .catch(error => next(error))
 })
