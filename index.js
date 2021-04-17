@@ -1,5 +1,5 @@
 // initialize app and other needed vars
-const { response } = require('express')
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -12,34 +12,36 @@ morgan.token('body', (req) => {
 })
 
 const app = express()
+const Person = require('./models/person')
+const { response } = require('express')
 
 app.use(express.json())
 app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
 
-let persons = [
-    {
-        id: 1,
-        name: "Arto Hellas",
-        number: "040-123456"
-    },
-    {
-        id: 2,
-        name: "Ada Lovelace",
-        number: "39-44-5323523"
-    },
-    {
-        id: 3,
-        name: "Dan Abramov",
-        number: "12-43-234345"
-    },
-    {
-        id: 4,
-        name: "Mary Poppendick",
-        number: "39-23-6423122"
-    }
-]
+// let persons = [
+//     {
+//         id: 1,
+//         name: "Arto Hellas",
+//         number: "040-123456"
+//     },
+//     {
+//         id: 2,
+//         name: "Ada Lovelace",
+//         number: "39-44-5323523"
+//     },
+//     {
+//         id: 3,
+//         name: "Dan Abramov",
+//         number: "12-43-234345"
+//     },
+//     {
+//         id: 4,
+//         name: "Mary Poppendick",
+//         number: "39-23-6423122"
+//     }
+// ]
 
 // server endpoints
 /* GET requests */
@@ -56,19 +58,20 @@ app.get('/info', (req, resp) => {
 
 app.get('/api/persons', (req, resp) => {
     // console.log('returning list of persons to client')
-    resp.json(persons)
+    Person.find({}).then(people => {
+        resp.json(people)
+    })
+    
 })
 
 app.get('/api/persons/:id', (req, resp) => {
-    const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id)
-    
-    if (person) {
-        // console.log(`returning single item of id ${id.toString()} to client`)
-        resp.json(person)
-    } else {
-        resp.status(404).end()
-    }
+    Person.findById(req.params.id)
+        .then(person => {
+            resp.json(person)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
 })
 /* POST requests */
 app.post('/api/persons', (req, resp) => {
@@ -112,7 +115,7 @@ app.delete('/api/persons/:id', (req, resp) => {
 })
 
 // start app
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
