@@ -73,7 +73,7 @@ app.post('/api/persons', (req, resp, next) => {
             .catch(error => next(error))
     } else {
         const response = { error: "name or number is missing!" }
-        resp.json(response)
+        resp.status(400).json(response)
     }
 })
 /* PUT requests */
@@ -84,7 +84,7 @@ app.put('/api/persons/:id', (req, resp, next) => {
         name: body.name,
         number: body.number
     }
-    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             resp.json(updatedPerson)
         })
