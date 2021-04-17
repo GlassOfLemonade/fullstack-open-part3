@@ -14,34 +14,12 @@ morgan.token('body', (req) => {
 const app = express()
 const Person = require('./models/person')
 const { response } = require('express')
+const person = require('./models/person')
 
 app.use(express.json())
 app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
-
-// let persons = [
-//     {
-//         id: 1,
-//         name: "Arto Hellas",
-//         number: "040-123456"
-//     },
-//     {
-//         id: 2,
-//         name: "Ada Lovelace",
-//         number: "39-44-5323523"
-//     },
-//     {
-//         id: 3,
-//         name: "Dan Abramov",
-//         number: "12-43-234345"
-//     },
-//     {
-//         id: 4,
-//         name: "Mary Poppendick",
-//         number: "39-23-6423122"
-//     }
-// ]
 
 // server endpoints
 /* GET requests */
@@ -67,28 +45,19 @@ app.get('/api/persons', (req, resp) => {
 app.get('/api/persons/:id', (req, resp) => {
     Person.findById(req.params.id)
         .then(person => {
-            resp.json(person)
+            if (person) {
+                resp.json(person)
+            } else {
+                resp.status(404).end()
+            }
         })
-        .catch((error) => {
-            console.log(error)
-        })
+        .catch(error => next(error))
 })
 /* POST requests */
 app.post('/api/persons', (req, resp) => {
-    // console.log(req.headers)
-    // const newId = Math.trunc(Math.random() * 100000)
     const body = req.body
 
     if (body.name && body.number) {
-        // const duplicate = persons.find(person => person.name === body.name)
-        // if (duplicate) {
-        //     // a duplicate exists
-        //     console.log(duplicate)
-        //     const error = { error: "name must be unique!" }
-        //     resp.json(error)
-        // } else {
-
-        // }
         const person = new Person({
             name: body.name,
             number: body.number
@@ -98,15 +67,26 @@ app.post('/api/persons', (req, resp) => {
             .then(savedPerson => {
                 resp.json(savedPerson)
             })
-            .catch((error) => {
-                console.log(error)
-            })
+            .catch(error => next(error))
     } else {
         const response = { error: "name or number is missing!" }
         resp.json(response)
     }
 })
 /* PUT requests */
+app.put('/api/persons/:id', (req, resp) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            resp.json(updatedPerson)
+        })
+        .catch(error => next(error))
+})
 /* DELETE requests */
 app.delete('/api/persons/:id', (req, resp) => {
     Person.findByIdAndRemove(req.params.id)
@@ -115,6 +95,25 @@ app.delete('/api/persons/:id', (req, resp) => {
         })
         .catch(error => next(error))
 })
+
+// unknown endpoint handling
+const UnknownEndpoint = (req, resp) => {
+    resp.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(UnknownEndpoint)
+
+// error handling
+const errorHandler = (error, req, resp, next) => {
+    console.error(error.message)
+
+    // cast error from mongodb object transform
+    if (error.name === 'CastError') {
+        return resp.status(400).send({ error: 'malformed id' })
+    }
+
+    next(error)
+}
+app.use(errorHandler)
 
 // start app
 const PORT = process.env.PORT
