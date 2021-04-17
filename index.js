@@ -27,7 +27,7 @@ app.get('/', (req, resp) => {
     resp.send('<h1>Hello World!</h1>')
 })
 
-app.get('/info', (req, resp) => {
+app.get('/info', (req, resp, next) => {
     // console.log("sending info about phonebook to client")
     const time = new Date().toString()
     Person.find({}).then(people => {
@@ -37,7 +37,7 @@ app.get('/info', (req, resp) => {
     .catch(error => next(error))
 })
 
-app.get('/api/persons', (req, resp) => {
+app.get('/api/persons', (req, resp, next) => {
     // console.log('returning list of persons to client')
     Person.find({}).then(people => {
         resp.json(people)
@@ -45,7 +45,7 @@ app.get('/api/persons', (req, resp) => {
     .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, resp) => {
+app.get('/api/persons/:id', (req, resp, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person) {
@@ -57,7 +57,7 @@ app.get('/api/persons/:id', (req, resp) => {
         .catch(error => next(error))
 })
 /* POST requests */
-app.post('/api/persons', (req, resp) => {
+app.post('/api/persons', (req, resp, next) => {
     const body = req.body
 
     if (body.name && body.number) {
@@ -77,7 +77,7 @@ app.post('/api/persons', (req, resp) => {
     }
 })
 /* PUT requests */
-app.put('/api/persons/:id', (req, resp) => {
+app.put('/api/persons/:id', (req, resp, next) => {
     const body = req.body
 
     const person = {
@@ -91,7 +91,7 @@ app.put('/api/persons/:id', (req, resp) => {
         .catch(error => next(error))
 })
 /* DELETE requests */
-app.delete('/api/persons/:id', (req, resp) => {
+app.delete('/api/persons/:id', (req, resp, next) => {
     Person.findByIdAndRemove(req.params.id)
         .then(result => {
             resp.status(204).end()
@@ -112,6 +112,8 @@ const errorHandler = (error, req, resp, next) => {
     // cast error from mongodb object transform
     if (error.name === 'CastError') {
         return resp.status(400).send({ error: 'malformed id' })
+    } else if (error.name === 'ValidationError') {
+        return resp.status(400).json({ error: error.message })
     }
 
     next(error)
