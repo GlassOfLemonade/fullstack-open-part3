@@ -30,8 +30,11 @@ app.get('/', (req, resp) => {
 app.get('/info', (req, resp) => {
     // console.log("sending info about phonebook to client")
     const time = new Date().toString()
-    const num = persons.length
-    resp.send(`<p>Phonebook has info for ${num} people</p><p>${time}</p>`)
+    Person.find({}).then(people => {
+        const num = people.length
+        resp.send(`<p>Phonebook has info for ${num} people</p><p>${time}</p>`)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons', (req, resp) => {
@@ -39,7 +42,7 @@ app.get('/api/persons', (req, resp) => {
     Person.find({}).then(people => {
         resp.json(people)
     })
-    
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, resp) => {
